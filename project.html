@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project | Reza Fadli Harris</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+  <style>
+    /* project page: layout tweaks for the standalone detail page */
+    .detail-page { padding-top: var(--nav-h); }
+    .detail-page .detail-hero { padding-top: 64px; }
+    .detail-page .detail-hero .wrap-d,
+    .detail-page .detail-body { width: min(1160px, 92vw); margin: 0 auto; padding-left: 0; padding-right: 0; }
+    .detail-page .detail-body { padding-top: 56px; padding-bottom: 40px; }
+    .pn-wrap { width: min(1160px, 92vw); margin: 0 auto; padding: 20px 0 80px; }
+    .not-found { min-height: 60vh; display: grid; place-items: center; text-align: center; padding-top: var(--nav-h); }
+  </style>
+</head>
+<body>
+  <div id="progress"></div>
+
+  <!-- ================= NAV ================= -->
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">RF</span>
+        <span>Reza<span class="grad-text">.dev</span></span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#skills">Skills</a></li>
+          <li><a href="index.html#projects">Projects</a></li>
+          <li><a href="index.html#contact" class="nav-cta">Get in Touch</a></li>
+        </ul>
+      </nav>
+      <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main class="detail-page" id="detail-root"></main>
+
+  <div class="pn-wrap">
+    <div class="pn-nav" id="pn-nav"></div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> Reza Fadli Harris. Crafted with passion, designed & built with AI-assist.</span>
+      <span>Jakarta, Indonesia 🇮🇩</span>
+    </div>
+  </footer>
+
+  <script src="shared/data.js"></script>
+  <script>const ROOT = "";</script>
+  <script src="shared/main.js"></script>
+  <script>
+    const slug = new URLSearchParams(location.search).get("id");
+    const idx = PROJECTS.findIndex((x) => x.slug === slug);
+    const root = document.getElementById("detail-root");
+
+    if (idx === -1) {
+      root.innerHTML = `
+        <div class="not-found">
+          <div>
+            <h1 class="detail-title">Project not found 🤔</h1>
+            <p style="color:var(--muted);margin:14px 0 28px">The project you're looking for doesn't exist.</p>
+            <a class="btn btn-primary" href="index.html#projects">← Back to all projects</a>
+          </div>
+        </div>`;
+      document.getElementById("pn-nav").style.display = "none";
+    } else {
+      const p = PROJECTS[idx];
+      document.title = p.name + " | Reza Fadli Harris";
+      root.innerHTML = buildDetailHTML(p, { backHref: "index.html#projects" });
+      bindGalleries(root, p);
+
+      /* animate detail sections in */
+      root.querySelectorAll(".d-section, .d-side-card").forEach((el, i) => {
+        el.classList.add("reveal");
+        el.dataset.d = Math.min(i * 60, 300);
+      });
+
+      /* prev / next navigation */
+      const prev = PROJECTS[(idx - 1 + PROJECTS.length) % PROJECTS.length];
+      const next = PROJECTS[(idx + 1) % PROJECTS.length];
+      document.getElementById("pn-nav").innerHTML = `
+        <a class="pn-link reveal" href="project.html?id=${prev.slug}">
+          <small>← Previous Project</small>
+          <b>${prev.name}</b>
+        </a>
+        <a class="pn-link next reveal" href="project.html?id=${next.slug}">
+          <small>Next Project →</small>
+          <b>${next.name}</b>
+        </a>`;
+    }
+
+    bootShared();
+    initReveal(document);
+  </script>
+</body>
+</html>
